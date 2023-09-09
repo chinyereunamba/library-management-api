@@ -5,17 +5,20 @@ from .models import Author, Book, BookInstance, Genre, Transaction
 
 
 class BookAdmin(admin.ModelAdmin):
-    list_display = ["title", "quantity", "genre"]
-    search_fields = ["title", "genre"]
+    list_display = ["title", 'author', "quantity", "genre"]
+    search_fields = ["title", "genre", 'author']
 
 
 class TransactionAdmin(admin.ModelAdmin):
     list_display = ["book", "user", "admin"]
     search_fields = ["book", "user"]
 
+class BookInstanceAdmin(admin.ModelAdmin):
+    list_display = ['id', 'book', 'due_back']
+    readonly_fields = ['id']
 
 admin.site.register(Book, BookAdmin)
-admin.site.register(BookInstance)
+admin.site.register(BookInstance, BookInstanceAdmin)
 admin.site.register(Transaction, TransactionAdmin)
 admin.site.register(Genre)
 admin.site.register(Author)

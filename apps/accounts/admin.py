@@ -17,14 +17,15 @@ class AccountAdmin(ModelAdmin):
     ]
 
     search_fields = ['email', 'username']
-    readonly_fields = ['date_joined', 'last_login']
+    readonly_fields = ['date_joined', 'last_login', 'password']
 
     filter_horizontal = ()
     list_filter = ()
     fieldsets = ()
 
-
+class AdminsAdmin(admin.ModelAdmin):
+    list_display = ['user', 'phone_number']
 
 admin.site.register(Account, AccountAdmin)
-admin.site.register(Admin)
+admin.site.register(Admin, AdminsAdmin)
 admin.site.register(Student)

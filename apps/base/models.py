@@ -31,6 +31,9 @@ class Book(models.Model):
     class Meta:
         ordering = ["title"]
 
+    def __str__(self):
+        return self.title
+
 
 # LOAN_STATUS = [("borrowed", "Borrowed"), ("returned", "Returned")]
 
