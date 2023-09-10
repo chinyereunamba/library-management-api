@@ -26,7 +26,7 @@ SECRET_KEY = "django-insecure-islmo0bf+&_cdsb+&t!6^ve)&rk6fr@8n7-+@^dp87o4)8=^+u
 DEBUG = True
 
 ALLOWED_HOSTS = []
-AUTH_USER_MODEL = 'accounts.Account'
+AUTH_USER_MODEL = "accounts.Account"
 
 # Application definition
 
@@ -37,17 +37,23 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
     "apps.accounts",
     "apps.base",
-
     "rest_framework",
     "corsheaders",
+    "djoser",
 ]
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+    
+]
+
+CORS_ORIGIN_WHITELIST =[
+    'http://localhost:3000'
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -55,9 +61,7 @@ CORS_ALLOW_CREDENTIALS = True
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
-
     "corsheaders.middleware.CorsMiddleware",
-
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -115,6 +119,15 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# REST_FRAMEWORK = {
+#     'DEFAULT_AUTHENTICATION_CLASSES': [
+#         'rest_framework.authentication.SessionAuthentication',
+#     ],
+#     'DEFAULT_PERMISSION_CLASSES': [
+#         'rest_framework.permissions.IsAuthenticated',
+#     ]
+# }
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
@@ -137,3 +150,16 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+DJOSER = {
+    "PASSWORD_RESET_CONFIRM_URL": "/username-reset/{uid}/{token}",
+    "USER_CREATE_PASSWORD_RETYPE": True,
+    "SEND_ACTIVATION_EMAIL": True,
+    "PASSWORD_CHANGED_EMAIL_CONFIRMATION": True,
+    "ACTIVATION_URL": "activate/{uid}/{token}",
+    "PASSWORD_RESET_CONFIRM_RETYPE": True,
+    "PASSWORD_RESET_SHOW_EMAIL_NOT_FOUND": True,
+    "TOKEN_MODEL": None,
+}
+
+SITE_ID = 1

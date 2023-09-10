@@ -25,7 +25,7 @@ class Book(models.Model):
     isbn = models.CharField(verbose_name="ISBN", max_length=20, blank=True, null=True)
     summary = models.TextField(blank=True)
     date_added = models.DateField(auto_now_add=True)
-    genre = models.ForeignKey(Genre, on_delete=models.CASCADE)
+    genre = models.ForeignKey(Genre, on_delete=models.CASCADE, blank=True, null=True)
     quantity = models.IntegerField(verbose_name="Quantity of books", default=5)
 
     class Meta:
