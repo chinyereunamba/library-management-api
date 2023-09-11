@@ -7,3 +7,17 @@ class BookSerializer(serializers.ModelSerializer):
     class Meta:
         model = Book
         fields = "__all__"
+
+
+class GenreSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Genre
+        fields = ["genre"]
+
+
+class TransactionSerializer(serializers.ModelSerializer):
+    book = serializers.RelatedField(source="transaction.book", read_only=True)
+
+    class Meta:
+        model = Transaction
+        fields = ["__all__"]
