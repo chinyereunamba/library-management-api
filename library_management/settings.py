@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+from datetime import timedelta
 from pathlib import Path
 from decouple import config
 
@@ -21,10 +22,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('SECRET_KEY')
+SECRET_KEY = config("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG')
+DEBUG = config("DEBUG")
 
 ALLOWED_HOSTS = []
 AUTH_USER_MODEL = "accounts.Account"
@@ -32,6 +33,7 @@ AUTH_USER_MODEL = "accounts.Account"
 # Application definition
 
 INSTALLED_APPS = [
+    "django.contrib.sites",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -39,32 +41,39 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
 
-    "django.contrib.sites",
-
-
+    # Custom apps
     "apps.accounts",
     "apps.base",
 
 
+    # Apps for REST
+
     "rest_framework",
     "rest_framework.authtoken",
+    "rest_framework_simplejwt",
     "corsheaders",
-    "djoser",
 
-    "dj_rest_auth",
-    "dj_rest_auth.registration",
+    # Apps for authentication
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google",
 ]
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-    "http://localhost:8000",
-    "http://127.0.0.1:8000",
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.AllowAllUsersModelBackend",
+    "apps.accounts.backends.CaseInsensitiveModelBackend",
+    # "allauth.account.auth_backends.AuthenticationBackend",
 ]
+
+
+if DEBUG:
+    CORS_ALLOW_ALL_ORIGINS = True
+else:
+    CORS_ALLOWED_ORIGINS = [
+        "http://localhost:3000/",
+        "http://127.0.0.1:3000/",
+    ]
 
 CORS_ORIGIN_WHITELIST = ["http://localhost:3000"]
 
@@ -73,7 +82,10 @@ CORS_ALLOW_CREDENTIALS = True
 SOCIALACCOUNT_EMAIL_VERIFICATION = "none"
 SOCIALACCOUNT_EMAIL_REQUIRED = False
 
-REST_USE_JWT = True
+REST_AUTH = {
+    "USE_JWT": True,
+    "JWT_AUTH_HTTPONLY": False,
+}
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -84,7 +96,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "allauth.account.middleware.AccountMiddleware",
+    # "allauth.account.middleware.AccountMiddleware",
 ]
 
 ROOT_URLCONF = "library_management.urls"
@@ -137,14 +149,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# REST_FRAMEWORK = {
-#     'DEFAULT_AUTHENTICATION_CLASSES': [
-#         'rest_framework.authentication.SessionAuthentication',
-#     ],
-#     'DEFAULT_PERMISSION_CLASSES': [
-#         'rest_framework.permissions.IsAuthenticated',
-#     ]
-# }
 
 
 # Internationalization
@@ -182,3 +186,53 @@ DJOSER = {
 
 SITE_ID = 1
 
+SOCIALACCOUNT_PROVIDERS = {
+    "google": {
+        "APP": {
+            "client_id": config('CLIENT_ID'),  # replace me
+            "secret": config('CLIENT_SECRET'),        # replace me
+            "key": "",                               # leave empty
+        },
+        "SCOPE": [
+            "profile",
+            "email",
+        ],
+        "AUTH_PARAMS": {
+            "access_type": "online",
+        },
+        "VERIFIED_EMAIL": True,
+    },
+}
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "ROTATE_REFRESH_TOKENS": False,
+    "BLACKLIST_AFTER_ROTATION": False,
+    "UPDATE_LAST_LOGIN": True,
+    "SIGNING_KEY": 'complexsigninkey',
+    "USER_ID_FIELD": "id",
+    "USER_ID_CLAIM": "user_id",
+    "ALGORITHM": "HS512",
+}
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ]
+}
+
+
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 465
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+EMAIL_USE_TLS = True

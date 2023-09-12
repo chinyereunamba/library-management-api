@@ -24,10 +24,10 @@ class MyAccountManager(BaseUserManager):
         email = self.normalize_email(email).lower()
 
         user = self.create_user(
-            email=email, 
-            username=username, 
+            email=email,
+            username=username,
             password=password
-            )
+        )
 
         user.is_admin = True
         user.is_staff = True
@@ -39,9 +39,11 @@ class MyAccountManager(BaseUserManager):
 
 
 class Account(AbstractBaseUser):
-    email = models.EmailField(max_length=80, blank=False, null=False, unique=True)
+    email = models.EmailField(
+        max_length=80, blank=False, null=False, unique=True)
 
-    username = models.CharField(max_length=30, blank=False, null=False, unique=True)
+    username = models.CharField(
+        max_length=30, blank=False, null=False, unique=True)
 
     first_name = models.CharField(max_length=80, blank=True, null=True)
     last_name = models.CharField(max_length=80, blank=True, null=True)
@@ -68,16 +70,18 @@ class Account(AbstractBaseUser):
     def has_module_perms(self, app_label):
         return True
 
+
 class Admin(models.Model):
     user = models.OneToOneField(Account, on_delete=models.CASCADE)
     phone_number = models.CharField(max_length=20, blank=True, null=True)
 
     def __str__(self):
         return self.user.username
-    
+
+
 class Student(models.Model):
     user = models.OneToOneField(Account, on_delete=models.CASCADE)
     fee = models.IntegerField(verbose_name='School fees', default=20000)
 
     def __str__(self):
-        return self.user
+        return self.user.email
