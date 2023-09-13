@@ -25,6 +25,7 @@ urlpatterns = [
             }
         ),
     ),
-    path("genre/", GenreView.as_view({"post": "create", "get": "list"}), name="genre"),
-    path("transactions/", TransactionView.as_view(), name="transaction"),
+    path(
+        "genre/", GenreView.as_view({"post": "create", "get": "list"}), name="genre"),
+    path('borrow/new/', BookInstanceView.as_view(), name='book instance'),
 ]
