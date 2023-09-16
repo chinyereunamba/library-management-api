@@ -1,7 +1,25 @@
 from django.db import models
+from django.conf import settings
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 
 # Create your models here.
+
+
+class Admin(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    phone_number = models.CharField(max_length=20, blank=True, null=True)
+
+    def __str__(self):
+        return self.user.username
+
+
+class Student(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='student')
+    fee = models.IntegerField(verbose_name='School fees', default=20000)
+
+    def __str__(self):
+        return self.user.email
 
 
 class MyAccountManager(BaseUserManager):
@@ -70,18 +88,12 @@ class Account(AbstractBaseUser):
     def has_module_perms(self, app_label):
         return True
 
-
-class Admin(models.Model):
-    user = models.OneToOneField(Account, on_delete=models.CASCADE)
-    phone_number = models.CharField(max_length=20, blank=True, null=True)
-
-    def __str__(self):
-        return self.user.username
-
-
-class Student(models.Model):
-    user = models.OneToOneField(Account, on_delete=models.CASCADE)
-    fee = models.IntegerField(verbose_name='School fees', default=20000)
-
-    def __str__(self):
-        return self.user.email
+    def save(self, *args, **kwargs):
+        created = not self.pk
+        super().save(*args, **kwargs)
+        if created:
+            if self.is_admin:
+                Admin.objects.create(user=self)
+            else:
+                Student.objects.create(user=self)
+                

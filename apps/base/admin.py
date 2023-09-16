@@ -10,12 +10,13 @@ class BookAdmin(admin.ModelAdmin):
 
 
 class TransactionAdmin(admin.ModelAdmin):
-    list_display = ["book", "admin"]
-    search_fields = ["book", "user"]
+    list_display = ["book", 'ticket',"admin", 'approved']
+    search_fields = ["book", "book"]
 
 class BookInstanceAdmin(admin.ModelAdmin):
     list_display = ['id', 'book']
     readonly_fields = ['id']
+
 
 admin.site.register(Book, BookAdmin)
 admin.site.register(BookInstance, BookInstanceAdmin)

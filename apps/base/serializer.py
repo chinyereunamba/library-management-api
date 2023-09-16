@@ -6,8 +6,9 @@ from .models import *
 class BookSerializer(serializers.ModelSerializer):
     class Meta:
         model = Book
-        fields = "__all__"
-
+        fields = ['id','title', 'author', 'isbn', 'summary',
+                  'genre', 'quantity', 'books_available']
+        
 
 class GenreSerializer(serializers.ModelSerializer):
     class Meta:
@@ -16,11 +17,11 @@ class GenreSerializer(serializers.ModelSerializer):
 
 
 class TransactionSerializer(serializers.ModelSerializer):
-    book = serializers.RelatedField(source="transaction.book", read_only=True)
 
     class Meta:
         model = Transaction
-        fields = ["__all__"]
+        fields = "__all__"
+        depth = 2
 
 
 class BookInstanceSerializer(serializers.ModelSerializer):

@@ -1,6 +1,11 @@
 from django.db import models
+from django.db.models.signals import post_save
+from django.shortcuts import get_object_or_404
+from django.core.signals import request_finished
+from django.dispatch import receiver
 from apps.accounts.models import Account, Admin, Student
 import uuid
+from datetime import date
 
 # Create your models here.
 
@@ -39,9 +44,18 @@ class Book(models.Model):
     def __str__(self):
         return self.title
 
+    @property
+    def books_available(self):
+        books_available = self.quantity
+        return books_available
+
+    @books_available.setter
+    def set_books_available(self, value):
+        books_available = value
+    
+
 
 # LOAN_STATUS = [("borrowed", "Borrowed"), ("returned", "Returned")]
-
 
 class BookInstance(models.Model):
     """Model representing a specific copy of a book (i.e. that can be borrowed from the library)."""
@@ -49,6 +63,7 @@ class BookInstance(models.Model):
     id = models.UUIDField(
         primary_key=True,
         default=uuid.uuid4,
+        blank=True,
         help_text="Unique ID for this particular book across whole library",
     )
     book = models.ForeignKey(Book, on_delete=models.RESTRICT, null=True)
@@ -71,13 +86,15 @@ class BookInstance(models.Model):
 
     def __str__(self):
         """String for representing the Model object."""
-        return f"{self.id} ({self.book})"
+        return f"{self.book}"
 
 
 class Transaction(models.Model):
     """Model enables the provision of ticket to a student when a book is borrowed"""
 
-    admin = models.ForeignKey(Admin, on_delete=models.DO_NOTHING)
+    admin = models.ForeignKey(
+        Admin, on_delete=models.DO_NOTHING, blank=True, null=True)
+    ticket = models.CharField(max_length=255, default="")
     book = models.ForeignKey(BookInstance, on_delete=models.DO_NOTHING)
     date_borrowed = models.DateTimeField(
         verbose_name="date the book was borrowed",
@@ -86,7 +103,22 @@ class Transaction(models.Model):
         null=True,
     )
 
+    approved = models.BooleanField(default=False)
     due_back = models.DateField(null=True, blank=True)
 
-    def __str__(self):
-        return self.book
+    def save(self, *args, **kwargs):
+        if self.admin:
+            self.approved = True
+
+        self.ticket = self.book.id
+
+        super().save(*args, **kwargs)
+
+    def __str__(self,):
+        return f'{self.book}'
+
+
+@receiver(post_save, sender=BookInstance)
+def create_transaction(sender, instance, created, **kwargs):
+    if created:
+        Transaction.objects.create(book=instance)

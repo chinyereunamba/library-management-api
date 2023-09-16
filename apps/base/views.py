@@ -1,7 +1,8 @@
 from django.shortcuts import render
-from rest_framework.generics import (ListCreateAPIView, GenericAPIView, CreateAPIView)
+from rest_framework.generics import (
+    ListCreateAPIView, GenericAPIView, CreateAPIView, ListAPIView)
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 
 
@@ -19,6 +20,9 @@ from .serializer import (
     BookInstanceSerializer
 )
 
+from apps.accounts.models import Student
+from apps.accounts.serializers import StudentSerializer
+
 # Create your views here.
 
 
@@ -30,20 +34,22 @@ class BookViews(ModelViewSet):
 
 
 class GenreView(ModelViewSet):
-    queryset = Genre
+    queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     lookup_field = 'pk'
 
 
-
-# def borrow_book(request, pk):
-#     serializer = BookInstanceSerializer(data=request.data)
-
-#     if serializer.is_valid():
-#         serializer.save()
-#         response = serializer.data
-
-class BookInstanceView(CreateAPIView):
+class BookInstanceView(ModelViewSet):
+    queryset = BookInstance.objects.all()
     serializer_class = BookInstanceSerializer
-    queryset = BookInstance
-    permission_classes = [AllowAny,]
+    permission_classes = [AllowAny]
+
+class TicketView(ModelViewSet):
+    queryset = Transaction.objects.all()
+    serializer_class = TransactionSerializer
+    permission_classes = [AllowAny]
+
+class StudentView(ListAPIView):
+    queryset = Student.objects.all()
+    serializer_class = StudentSerializer
+    permission_classes = [AllowAny]
