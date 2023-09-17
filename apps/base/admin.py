@@ -14,7 +14,7 @@ class TransactionAdmin(admin.ModelAdmin):
     search_fields = ["book", "book"]
 
 class BookInstanceAdmin(admin.ModelAdmin):
-    list_display = ['id', 'book']
+    list_display = ['id', 'book', 'returned']
     readonly_fields = ['id']
 
 

@@ -43,11 +43,18 @@ class BookInstanceView(ModelViewSet):
     queryset = BookInstance.objects.all()
     serializer_class = BookInstanceSerializer
     permission_classes = [AllowAny]
+    lookup_field = 'id'
+
 
 class TicketView(ModelViewSet):
     queryset = Transaction.objects.all()
     serializer_class = TransactionSerializer
     permission_classes = [AllowAny]
+    lookup_field = 'pk'
+
+    def perform_update(self, serializer):
+        instance = serializer.save()
+        return super().perform_update(serializer)
 
 class StudentView(ListAPIView):
     queryset = Student.objects.all()

@@ -15,7 +15,8 @@ class Admin(models.Model):
 
 
 class Student(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='student')
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='student')
     fee = models.IntegerField(verbose_name='School fees', default=20000)
 
     def __str__(self):
@@ -77,6 +78,7 @@ class Account(AbstractBaseUser):
     objects = MyAccountManager()
 
     USERNAME_FIELD = "email"
+    EMAIL_FIELD = 'email'
     REQUIRED_FIELDS = ["username"]
 
     def __str__(self) -> str:
@@ -96,4 +98,3 @@ class Account(AbstractBaseUser):
                 Admin.objects.create(user=self)
             else:
                 Student.objects.create(user=self)
-                

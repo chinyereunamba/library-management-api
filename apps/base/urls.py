@@ -34,7 +34,11 @@ urlpatterns = [
                  "get": 'list',
              }
          ), name='book-instance'),
-    path('ticket/', TicketView.as_view({'get': 'list'})),
+    path('borrow/<slug:id>/',
+         BookInstanceView.as_view({"patch": 'partial_update'})),
+    path(
+        'ticket/', TicketView.as_view({'get': 'list', 'patch': "partial_update"})),
+    path('ticket/<int:pk>/', TicketView.as_view({'patch': "partial_update"})),
     path('users/', StudentView.as_view()),
-    
+
 ]

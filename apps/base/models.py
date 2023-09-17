@@ -5,7 +5,7 @@ from django.core.signals import request_finished
 from django.dispatch import receiver
 from apps.accounts.models import Account, Admin, Student
 import uuid
-from datetime import date
+from datetime import date, datetime
 
 # Create your models here.
 
@@ -67,6 +67,8 @@ class BookInstance(models.Model):
         help_text="Unique ID for this particular book across whole library",
     )
     book = models.ForeignKey(Book, on_delete=models.RESTRICT, null=True)
+    returned = models.BooleanField(default=False)
+    date_returned = models.DateField(blank=True, null=True)
 
     LOAN_STATUS = (
         ("o", "On loan"),
@@ -80,6 +82,11 @@ class BookInstance(models.Model):
         default="a",
         help_text="Book availability",
     )
+
+    def save(self, *args, **kwargs):
+        if self.returned:
+            self.date_returned = datetime.now()
+        super().save(*args, **kwargs)
 
     class Meta:
         ordering = ["book"]
@@ -116,6 +123,9 @@ class Transaction(models.Model):
 
     def __str__(self,):
         return f'{self.book}'
+    
+    class Meta:
+        ordering = ['-date_borrowed']
 
 
 @receiver(post_save, sender=BookInstance)
