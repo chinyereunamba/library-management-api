@@ -17,10 +17,15 @@ class Admin(models.Model):
 class Student(models.Model):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='student')
-    fee = models.IntegerField(verbose_name='School fees', default=20000)
+    paid_fees = models.IntegerField(verbose_name='School fees', default=15000)
 
     def __str__(self):
         return self.user.email
+
+    @property
+    def school_fees(self):
+        amount = 200000
+        return amount
 
 
 class MyAccountManager(BaseUserManager):

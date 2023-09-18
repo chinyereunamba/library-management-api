@@ -52,7 +52,6 @@ class Book(models.Model):
     @books_available.setter
     def set_books_available(self, value):
         books_available = value
-    
 
 
 # LOAN_STATUS = [("borrowed", "Borrowed"), ("returned", "Returned")]
@@ -85,7 +84,7 @@ class BookInstance(models.Model):
 
     def save(self, *args, **kwargs):
         if self.returned:
-            self.date_returned = datetime.now()
+            self.date_returned = date.today()
         super().save(*args, **kwargs)
 
     class Meta:
@@ -123,7 +122,7 @@ class Transaction(models.Model):
 
     def __str__(self,):
         return f'{self.book}'
-    
+
     class Meta:
         ordering = ['-date_borrowed']
 
